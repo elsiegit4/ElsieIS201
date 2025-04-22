@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboarding Basketball - Levels</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Added gradient background */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
+            border-radius: 1rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-font {
+             font-family: 'Press Start 2P', cursive;
+             color: #4a044e; /* Dark purple for title */
+        }
+        /* Basketball Hoop */
+        .hoop {
+            width: 100px;
+            height: 150px;
+            margin: 1rem auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .backboard {
+            width: 100px;
+            height: 70px;
+            background-color: #f8fafc; /* Lighter backboard */
+            border: 3px solid #64748b; /* Slate border */
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            z-index: 1;
+        }
+         .backboard-square {
+            position: absolute;
+            width: 30px;
+            height: 25px;
+            border: 2px solid #f59e0b; /* Amber square */
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .rim {
+            width: 60px;
+            height: 15px;
+            border: 4px solid #f59e0b; /* Amber rim */
+            border-radius: 0 0 50% 50%;
+            background-color: transparent;
+            position: relative;
+            top: -4px;
+            z-index: 2;
+        }
+        .net {
+            width: 52px;
+            height: 40px;
+            border-left: 2px dashed #94a3b8; /* Grayer net */
+            border-right: 2px dashed #94a3b8;
+            border-bottom: 2px dashed #94a3b8;
+            border-radius: 0 0 10px 10px;
+            position: relative;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        /* Basketball */
+        .basketball {
+            width: 65px; /* Slightly larger */
+            height: 65px;
+            background: radial-gradient(circle at 30% 30%, #fdba74, #f97316); /* Gradient ball */
+            border-radius: 50%;
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #451a03; /* Dark brown text */
+            font-size: 0.85rem; /* Adjusted font size */
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+            transition: transform 0.5s ease-out, bottom 0.5s ease-out, left 0.5s ease-out;
+            z-index: 5;
+            padding: 6px;
+            overflow-wrap: break-word;
+            word-break: break-all;
+            text-align: center;
+            line-height: 1.1;
+            border: 1px solid #ea580c; /* Outline */
+        }
+
+        /* Animations (remain the same, but adjusted target positions if needed) */
+         .basketball.score { animation: shoot-score 0.7s ease-in-out forwards; }
+         .basketball.miss { animation: shoot-miss 0.7s ease-in-out forwards; }
+
+        @keyframes shoot-score {
+            0% { bottom: 150px; left: 50%; transform: translateX(-50%) scale(1) rotate(0deg); opacity: 1; }
+            50% { bottom: 310px; left: 50%; transform: translateX(-50%) scale(1.1) rotate(90deg); opacity: 1; } /* Higher apex */
+            95% { bottom: 235px; left: 50%; transform: translateX(-50%) scale(0.8) rotate(180deg); opacity: 1; } /* Point of going through */
+            100% { bottom: 230px; left: 50%; transform: translateX(-50%) scale(0.7) rotate(190deg); opacity: 0; } /* Fade out */
+        }
+        @keyframes shoot-miss {
+             0% { bottom: 150px; left: 50%; transform: translateX(-50%) scale(1) rotate(0deg); opacity: 1; }
+            50% { bottom: 320px; left: 65%; transform: translateX(-50%) scale(1.1) rotate(70deg); opacity: 1; } /* Higher/wider apex */
+            100% { bottom: 150px; left: 75%; transform: translateX(-50%) scale(1) rotate(140deg); opacity: 0; } /* Fade out after miss */
+        }
+
+        /* Input and Info styling */
+        .info-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        .info-box {
+            background-color: #e0e7ff; /* Light indigo background */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: #3730a3; /* Indigo text */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .info-box.time { /* Different color for time */
+             background-color: #fff1f2; /* Light pink */
+             color: #be123c; /* Pink text */
+        }
+        input[type="text"] {
+            border: 2px solid #d1d5db; /* Gray border */
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            width: 80%;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+         input[type="text"]:focus {
+             outline: none;
+             border-color: #f59e0b; /* Amber highlight */
+             box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.3); /* Amber glow */
+         }
+
+         /* Start/End Message Box */
+        .message-box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            z-index: 10;
+            border-radius: 1rem; /* Match container */
+            padding: 2rem;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+         .message-box.hidden {
+            opacity: 0;
+            pointer-events: none; /* Prevent interaction when hidden */
+         }
+        .message-box h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fcd34d; /* Yellow title */
+        }
+        .message-box p {
+            font-size: 1.2rem; /* Slightly smaller */
+            margin-bottom: 1.5rem;
+            max-width: 80%;
+        }
+        /* Difficulty buttons container */
+        .difficulty-select {
+            display: flex;
+            gap: 1rem; /* Space between buttons */
+            margin-top: 1rem;
+        }
+        .message-box button {
+            background-color: #fb923c; /* Lighter orange */
+            color: #451a03; /* Dark brown text */
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.1rem; /* Slightly smaller */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .message-box button:hover {
+            background-color: #f97316; /* Standard orange on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+         .message-box button:active {
+             transform: translateY(0px); /* Button press effect */
+         }
+        /* Specific styles for difficulty buttons */
+        .easy-button {
+            background-color: #86efac; /* Green */
+            color: #14532d; /* Dark Green */
+        }
+        .easy-button:hover { background-color: #4ade80; }
+        .hard-button {
+            background-color: #f87171; /* Red */
+            color: #7f1d1d; /* Dark Red */
+        }
+        .hard-button:hover { background-color: #ef4444; }
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="text-3xl font-bold mb-4 game-font">Keyboarding Hoops</h1>
+
+        <div class="info-bar">
+            <div class="info-box">Score: <span id="score">0</span></div>
+            <div class="info-box time game-font">Time: <span id="time">30</span>s</div>
+            <div class="info-box">Level: <span id="level-display">-</span></div>
+        </div>
+
+        <div class="game-area relative h-80 mb-4">
+            <div class="hoop absolute top-0 left-1/2 transform -translate-x-1/2">
+                 <div class="backboard">
+                    <div class="backboard-square"></div>
+                </div>
+                <div class="rim"></div>
+                <div class="net"></div>
+            </div>
+            <div id="basketball" class="basketball" style="opacity: 0;">
+                <span id="word-display"></span>
+            </div>
+        </div>
+
+        <input type="text" id="word-input" placeholder="Type the word here..." autocomplete="off" disabled>
+
+        <div id="message-box" class="message-box">
+             <h2 class="game-font" id="message-title">Select Difficulty</h2>
+             <p id="message-text">Choose your challenge level to start playing!</p>
+             <div id="difficulty-selection" class="difficulty-select">
+                 <button id="easy-button" class="easy-button" data-difficulty="easy">Easy</button>
+                 <button id="hard-button" class="hard-button" data-difficulty="hard">Hard</button>
+             </div>
+             <button id="play-again-button" class="hidden">Play Again?</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game Elements ---
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const levelDisplay = document.getElementById('level-display'); // Added level display
+        const wordDisplay = document.getElementById('word-display');
+        const wordInput = document.getElementById('word-input');
+        const basketball = document.getElementById('basketball');
+        const messageBox = document.getElementById('message-box');
+        const messageTitle = document.getElementById('message-title');
+        const messageText = document.getElementById('message-text');
+        const difficultySelectionDiv = document.getElementById('difficulty-selection');
+        const easyButton = document.getElementById('easy-button');
+        const hardButton = document.getElementById('hard-button');
+        const playAgainButton = document.getElementById('play-again-button');
+
+        // --- Game Settings ---
+        const GAME_TIME = 30; // seconds
+        const easyWords = [ // Simple words & chars, case-insensitive
+            "a", "s", "d", "f", "j", "k", "l", ";", "go", "it", "up", "on",
+            "me", "we", "cat", "dog", "sun", "run", "fun", "key", "type",
+            "ball", "hoop", "net", "sky", "blue", "red", "one", "two", "six"
+        ];
+        const hardWords = [ // Longer, symbols, case-sensitive
+            "Syntax;", "Object{", "}Return", "Const!", "Await*", "Async/",
+            "Filter%", "Length?", "Click()", "Value$", "Number:", "String!",
+            "Query?", "Method#", "Class@", "Array[", "]Index", "Event^",
+            "Target&", "Margin>", "<Padding"
+        ];
+
+        // --- Game State ---
+        let score = 0;
+        let time = GAME_TIME;
+        let currentWord = '';
+        let difficulty = ''; // 'easy' or 'hard'
+        let words = []; // Holds the word list for the current difficulty
+        let isPlaying = false;
+        let timerInterval = null;
+        let animationTimeout = null;
+
+        // --- Functions ---
+
+        // Setup Initial Screen
+        function setupInitialScreen() {
+            messageTitle.textContent = "Select Difficulty";
+            messageText.textContent = "Choose your challenge level to start playing!";
+            difficultySelectionDiv.classList.remove('hidden');
+            playAgainButton.classList.add('hidden');
+            messageBox.classList.remove('hidden');
+            wordInput.disabled = true;
+            basketball.style.opacity = 0; // Hide ball initially
+            levelDisplay.textContent = '-';
+            scoreDisplay.textContent = '0';
+            timeDisplay.textContent = GAME_TIME;
+        }
+
+        // Initialize Game / Start Game
+        function startGame(selectedDifficulty) {
+            difficulty = selectedDifficulty;
+            words = difficulty === 'easy' ? easyWords : hardWords;
+            levelDisplay.textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1); // Capitalize first letter
+
+            score = 0;
+            time = GAME_TIME;
+            isPlaying = true;
+
+            scoreDisplay.textContent = score;
+            timeDisplay.textContent = time;
+
+            wordInput.disabled = false;
+            wordInput.value = '';
+            wordInput.focus();
+
+            // Hide message box elements related to selection/end game
+            messageBox.classList.add('hidden');
+            difficultySelectionDiv.classList.add('hidden');
+            playAgainButton.classList.add('hidden');
+
+
+            // Start the timer
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Show the first word
+            showNewWord();
+        }
+
+        // Update Timer
+        function updateTimer() {
+            time--;
+            timeDisplay.textContent = time;
+            if (time <= 0) {
+                endGame();
+            }
+        }
+
+        // Show New Word
+        function showNewWord() {
+            // Reset ball appearance and position before showing new word
+            basketball.classList.remove('score', 'miss');
+            basketball.style.opacity = 1; // Make ball visible
+            basketball.style.bottom = '150px';
+            basketball.style.left = '50%';
+            basketball.style.transform = 'translateX(-50%) scale(1) rotate(0deg)';
+            if (animationTimeout) clearTimeout(animationTimeout);
+
+            // Select a random word from the chosen list
+            const randomIndex = Math.floor(Math.random() * words.length);
+            currentWord = words[randomIndex];
+            wordDisplay.textContent = currentWord;
+            wordInput.value = ''; // Clear input
+        }
+
+        // Check Typed Word
+        function checkWord(event) {
+            // Only check if Enter key is pressed, game is playing, and input is not empty
+            if (event.key === 'Enter' && isPlaying && wordInput.value.trim() !== '') {
+                let typedWord = wordInput.value.trim(); // Keep case for hard mode check
+                let targetWord = currentWord;
+
+                // Apply case-insensitivity only for easy mode
+                if (difficulty === 'easy') {
+                    typedWord = typedWord.toLowerCase();
+                    targetWord = targetWord.toLowerCase();
+                }
+
+                // Disable input during animation
+                wordInput.disabled = true;
+
+                if (typedWord === targetWord) {
+                    // Correct Word - Animate Score
+                    basketball.classList.add('score');
+                    score++;
+                    scoreDisplay.textContent = score;
+                } else {
+                    // Incorrect Word - Animate Miss
+                    basketball.classList.add('miss');
+                }
+
+                // Set a timeout to show the next word after the animation finishes
+                animationTimeout = setTimeout(() => {
+                    if (isPlaying) { // Check if game hasn't ended during animation
+                         showNewWord();
+                         wordInput.disabled = false; // Re-enable input
+                         wordInput.focus();
+                    }
+                }, 700); // Matches animation duration
+            }
+        }
+
+        // End Game
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            wordInput.disabled = true;
+            wordInput.value = '';
+
+            // Clear pending animations/word changes and hide ball
+            if (animationTimeout) clearTimeout(animationTimeout);
+            basketball.classList.remove('score', 'miss');
+            basketball.style.opacity = 0;
+
+            // Show final score message
+            messageTitle.textContent = "Time's Up!";
+            messageText.innerHTML = `Level: ${difficulty.toUpperCase()}<br>Final Score: <strong class="text-2xl">${score}</strong>`;
+            playAgainButton.classList.remove('hidden'); // Show play again button
+            difficultySelectionDiv.classList.add('hidden'); // Hide difficulty buttons
+            messageBox.classList.remove('hidden'); // Show message box
+        }
+
+        // --- Event Listeners ---
+        easyButton.addEventListener('click', () => startGame('easy'));
+        hardButton.addEventListener('click', () => startGame('hard'));
+        playAgainButton.addEventListener('click', setupInitialScreen); // Go back to difficulty select
+        wordInput.addEventListener('keypress', checkWord);
+
+        // --- Initial Setup ---
+        setupInitialScreen(); // Show difficulty selection on load
+    </script>
+    <br>
+    <br>
+    <br>
+        <!-- Back to Résumé link -->
+      <div class="mt-4 text-center p-4">
+        <a href="scratch.html" class="text-indigo-700 hover:underline font-semibold">
+           Back to Resume
+        </a>
+      </div>
+</body>
+</html>
